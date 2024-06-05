@@ -75,6 +75,29 @@ pub fn rand_mutate<R: Rng>(a: &[u8], k: usize, alpha: &[u8], rng: &mut R) -> Vec
     b
 }
 
+/// Given an input byte string, craete a randomly mutated copy with substitutions only.
+pub fn rand_mutate_subs<R: Rng>(a: &[u8], k: usize, alpha: &[u8], rng: &mut R) -> Vec<u8> {
+    let mut b = vec![];
+    let mut i = 0;
+    let mut edits = 0;
+
+    while i < a.len() {
+        if edits < k && rng.gen_range(0..a.len()) < k {
+            let mut iter = alpha.choose_multiple(rng, 2);
+            let first = *iter.next().unwrap();
+            let second = *iter.next().unwrap();
+            b.push(if first == a[i] { second } else { first });
+            edits += 1;
+        } else {
+            b.push(a[i]);
+        }
+
+        i += 1;
+    }
+
+    b
+}
+
 /// Generate a random string of a certain length, with a certain
 /// alphabet.
 pub fn rand_str<R: Rng>(length: usize, alpha: &[u8], rng: &mut R) -> Vec<u8> {
